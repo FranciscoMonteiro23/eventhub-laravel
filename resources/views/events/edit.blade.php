@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 style="font-size: 1.5rem; font-weight: bold;">Editar: {{ $event->title }}</h2>
+        <h2 style="font-size: 1.5rem; font-weight: bold;">Editar Evento</h2>
     </x-slot>
 
     <div style="padding: 2rem;">
@@ -8,93 +8,174 @@
             
             <div style="background: white; border-radius: 0.5rem; padding: 2rem;">
                 
-                <form action="{{ route('events.update', $event) }}" method="POST">
+                <!-- ⚠️ IMPORTANTE: enctype="multipart/form-data" para upload de ficheiros -->
+                <form action="{{ route('events.update', $event) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
                     <div style="margin-bottom: 1.5rem;">
                         <label style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Título *</label>
-                        <input type="text" name="title" value="{{ $event->title }}" required
+                        <input type="text" name="title" value="{{ old('title', $event->title) }}" required
                                style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                        @error('title')
+                            <p style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div style="margin-bottom: 1.5rem;">
                         <label style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Descrição *</label>
                         <textarea name="description" rows="5" required
-                                  style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">{{ $event->description }}</textarea>
+                                  style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">{{ old('description', $event->description) }}</textarea>
+                        @error('description')
+                            <p style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div style="margin-bottom: 1.5rem;">
                         <label style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Categoria *</label>
                         <select name="category_id" required
                                 style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                            <option value="">Selecione...</option>
                             @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ $event->category_id == $category->id ? 'selected' : '' }}>
+                                <option value="{{ $category->id }}" {{ old('category_id', $event->category_id) == $category->id ? 'selected' : '' }}>
                                     {{ $category->name }}
                                 </option>
                             @endforeach
                         </select>
+                        @error('category_id')
+                            <p style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div style="margin-bottom: 1.5rem;">
                         <label style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Localização *</label>
-                        <input type="text" name="location" value="{{ $event->location }}" required
+                        <input type="text" name="location" value="{{ old('location', $event->location) }}" required
+                               placeholder="Ex: Porto, Lisboa, Coimbra"
                                style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                        @error('location')
+                            <p style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
                         <div>
                             <label style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Data Início *</label>
-                            <input type="datetime-local" name="start_date" value="{{ $event->start_date->format('Y-m-d\TH:i') }}" required
+                            <input type="datetime-local" 
+                                   name="start_date" 
+                                   value="{{ old('start_date', $event->start_date ? $event->start_date->format('Y-m-d\TH:i') : '') }}" 
+                                   required
                                    style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                            @error('start_date')
+                                <p style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
-                            <label style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Data Fim *</label>
-                            <input type="datetime-local" name="end_date" value="{{ $event->end_date->format('Y-m-d\TH:i') }}" required
+                            <label style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Data Fim</label>
+                            <input type="datetime-local" 
+                                   name="end_date" 
+                                   value="{{ old('end_date', $event->end_date ? $event->end_date->format('Y-m-d\TH:i') : '') }}"
                                    style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                            @error('end_date')
+                                <p style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
                         <div>
                             <label style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Max Participantes *</label>
-                            <input type="number" name="max_participants" value="{{ $event->max_participants }}" required
+                            <input type="number" name="max_participants" value="{{ old('max_participants', $event->max_participants) }}" min="1" required
                                    style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                            @error('max_participants')
+                                <p style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Preço (€) *</label>
-                            <input type="number" name="price" value="{{ $event->price }}" step="0.01" required
+                            <input type="number" name="price" value="{{ old('price', $event->price) }}" step="0.01" min="0" required
                                    style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                            @error('price')
+                                <p style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ $message }}</p>
+                            @enderror
                         </div>
+                    </div>
+
+                    <!-- 📸 CAMPO DE UPLOAD DE IMAGEM -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; font-weight: bold; margin-bottom: 0.5rem;">📸 Imagem do Evento</label>
+                        
+                        <!-- Imagem atual -->
+                        @if($event->image)
+                            <div style="margin-bottom: 1rem;">
+                                <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">Imagem atual:</p>
+                                <img src="{{ asset('storage/' . $event->image) }}" 
+                                     alt="{{ $event->title }}"
+                                     style="max-width: 300px; border-radius: 0.5rem; border: 2px solid #e5e7eb;">
+                            </div>
+                        @endif
+                        
+                        <input type="file" 
+                               name="image" 
+                               id="image" 
+                               accept="image/jpeg,image/png,image/jpg,image/gif"
+                               style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
+                        <p style="margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280;">
+                            @if($event->image)
+                                Deixa em branco para manter a imagem atual. 
+                            @endif
+                            Formatos aceites: JPG, PNG, GIF (máx. 2MB)
+                        </p>
+                        @error('image')
+                            <p style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div style="margin-bottom: 1.5rem;">
                         <label style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Status *</label>
                         <select name="status" required
                                 style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
-                            <option value="draft" {{ $event->status == 'draft' ? 'selected' : '' }}>Rascunho</option>
-                            <option value="published" {{ $event->status == 'published' ? 'selected' : '' }}>Publicado</option>
-                            <option value="cancelled" {{ $event->status == 'cancelled' ? 'selected' : '' }}>Cancelado</option>
-                            <option value="completed" {{ $event->status == 'completed' ? 'selected' : '' }}>Concluído</option>
+                            <option value="draft" {{ old('status', $event->status) == 'draft' ? 'selected' : '' }}>Rascunho</option>
+                            <option value="published" {{ old('status', $event->status) == 'published' ? 'selected' : '' }}>Publicado</option>
+                            <option value="cancelled" {{ old('status', $event->status) == 'cancelled' ? 'selected' : '' }}>Cancelado</option>
+                            <option value="completed" {{ old('status', $event->status) == 'completed' ? 'selected' : '' }}>Concluído</option>
                         </select>
+                        @error('status')
+                            <p style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div style="margin-bottom: 1.5rem;">
-                        <label style="display: flex; align-items: center; gap: 0.5rem;">
-                            <input type="checkbox" name="is_featured" value="1" {{ $event->is_featured ? 'checked' : '' }}>
-                            <span>Marcar como destaque</span>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" name="is_featured" value="1" {{ old('is_featured', $event->is_featured) ? 'checked' : '' }}>
+                            <span style="font-weight: 600;">⭐ Marcar como destaque</span>
                         </label>
                     </div>
 
                     <div style="display: flex; gap: 1rem;">
                         <button type="submit" 
-                                style="background: #3b82f6; color: white; padding: 0.75rem 1.5rem; border-radius: 0.375rem; border: none; cursor: pointer; font-weight: bold;">
-                            Atualizar Evento
+                                style="background: #f59e0b; color: white; padding: 0.75rem 1.5rem; border-radius: 0.375rem; border: none; cursor: pointer; font-weight: bold;"
+                                onmouseover="this.style.background='#d97706'" 
+                                onmouseout="this.style.background='#f59e0b'">
+                            ✓ Atualizar Evento
                         </button>
                         <a href="{{ route('events.index') }}" 
-                           style="background: #6b7280; color: white; padding: 0.75rem 1.5rem; border-radius: 0.375rem; text-decoration: none; font-weight: bold;">
+                           style="background: #6b7280; color: white; padding: 0.75rem 1.5rem; border-radius: 0.375rem; text-decoration: none; font-weight: bold; display: inline-block;">
                             Cancelar
                         </a>
+                        
+                        <!-- Botão Apagar -->
+                        <form action="{{ route('events.destroy', $event) }}" method="POST" 
+                              onsubmit="return confirm('Tens a certeza que queres apagar este evento?')"
+                              style="margin-left: auto;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" 
+                                    style="background: #ef4444; color: white; padding: 0.75rem 1.5rem; border-radius: 0.375rem; border: none; cursor: pointer; font-weight: bold;"
+                                    onmouseover="this.style.background='#dc2626'" 
+                                    onmouseout="this.style.background='#ef4444'">
+                                🗑️ Apagar Evento
+                            </button>
+                        </form>
                     </div>
                 </form>
 

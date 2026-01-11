@@ -16,20 +16,18 @@ class Registration extends Model
         'user_id',
         'event_id',
         'status',
-        'payment_status',
-        'notes',
-        'attended_at',
+        'registration_date',
     ];
 
     /**
      * The attributes that should be cast.
      */
     protected $casts = [
-        'attended_at' => 'datetime',
+        'registration_date' => 'datetime',
     ];
 
     /**
-     * Relação N:1 - Uma inscrição pertence a um utilizador
+     * Relação: Inscrição pertence a um User
      */
     public function user()
     {
@@ -37,34 +35,10 @@ class Registration extends Model
     }
 
     /**
-     * Relação N:1 - Uma inscrição pertence a um evento
+     * Relação: Inscrição pertence a um Event
      */
     public function event()
     {
         return $this->belongsTo(Event::class);
-    }
-
-    /**
-     * Scope para inscrições confirmadas
-     */
-    public function scopeConfirmed($query)
-    {
-        return $query->where('status', 'confirmed');
-    }
-
-    /**
-     * Scope para inscrições pagas
-     */
-    public function scopePaid($query)
-    {
-        return $query->where('payment_status', 'paid');
-    }
-
-    /**
-     * Verificar se fez check-in
-     */
-    public function getHasAttendedAttribute()
-    {
-        return !is_null($this->attended_at);
     }
 }

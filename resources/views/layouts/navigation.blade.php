@@ -19,6 +19,21 @@
                     {{-- Events (todos podem ver) --}}
                     <x-nav-link :href="route('events.index')" :active="request()->routeIs('events.*')">
                         Eventos
+                        <!-- Adiciona isto DENTRO do menu, depois do link "Events" -->
+
+<!-- Link para Participants verem as suas inscrições -->
+@if(Auth::user()->role === 'participant' || Auth::user()->role === 'organizer')
+    <x-nav-link :href="route('registrations.my')" :active="request()->routeIs('registrations.my')">
+        {{ __('As Minhas Inscrições') }}
+    </x-nav-link>
+@endif
+
+<!-- Link para Admin/Organizer gerirem inscrições -->
+@if(Auth::user()->role === 'admin' || Auth::user()->role === 'organizer')
+    <x-nav-link :href="route('registrations.index')" :active="request()->routeIs('registrations.index')">
+        {{ __('Gestão de Inscrições') }}
+    </x-nav-link>
+@endif
                     </x-nav-link>
                     
                     {{-- Categories (apenas admin) --}}

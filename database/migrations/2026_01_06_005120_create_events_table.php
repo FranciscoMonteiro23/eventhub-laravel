@@ -33,7 +33,7 @@ return new class extends Migration
             
             // Datas
             $table->dateTime('start_date');
-            $table->dateTime('end_date');
+            $table->dateTime('end_date')->nullable(); // ← CORRIGIDO: agora é nullable
             
             // Capacidade
             $table->integer('max_participants')->default(100);

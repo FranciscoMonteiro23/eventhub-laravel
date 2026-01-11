@@ -9,19 +9,22 @@ use Symfony\Component\HttpFoundation\Response;
 
 class IsOrganizer
 {
+    /**
+     * Handle an incoming request.
+     */
     public function handle(Request $request, Closure $next): Response
     {
-        // Verifica se está autenticado
+        // Verificar se o user está autenticado
         if (!Auth::check()) {
-            return redirect('/login');
+            abort(401, 'Precisas de fazer login.');
         }
 
-        // Verifica se é organizador OU admin
-        $userRole = Auth::user()->role;
-        if ($userRole !== 'organizer' && $userRole !== 'admin') {
-            abort(403, 'Acesso negado. Apenas organizadores.');
+        // Verificar se é admin ou organizer
+        if (Auth::user()->role === 'admin' || Auth::user()->role === 'organizer') {
+            return $next($request);
         }
 
-        return $next($request);
+        // Se não for, bloquear acesso
+        abort(403, 'Não tens permissão para aceder a esta área. Apenas Organizadores e Administradores.');
     }
 }

@@ -13,29 +13,16 @@ return new class extends Migration
     {
         Schema::create('registrations', function (Blueprint $table) {
             $table->id();
-            
-            // Relação N:N entre Users e Events
-            $table->foreignId('user_id')
-                  ->constrained()
-                  ->onDelete('cascade');
-            
-            $table->foreignId('event_id')
-                  ->constrained()
-                  ->onDelete('cascade');
-            
-            // Informações da inscrição
-            $table->enum('status', ['pending', 'confirmed', 'cancelled'])
-                  ->default('confirmed');
-            
-            $table->enum('payment_status', ['unpaid', 'paid', 'refunded'])
-                  ->default('unpaid');
-            
-            $table->text('notes')->nullable(); // Notas do participante
-            $table->timestamp('attended_at')->nullable(); // Check-in no evento
-            
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('event_id')->constrained()->onDelete('cascade');
+            $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('confirmed');
+            $table->timestamp('registration_date')->useCurrent(); // ← ESTA LINHA É IMPORTANTE!
+            $table->enum('payment_status', ['pending', 'paid', 'refunded'])->nullable();
+            $table->text('notes')->nullable();
+            $table->timestamp('attended_at')->nullable();
             $table->timestamps();
-            
-            // Prevenir inscrições duplicadas
+
+            // Evitar inscrições duplicadas
             $table->unique(['user_id', 'event_id']);
         });
     }
