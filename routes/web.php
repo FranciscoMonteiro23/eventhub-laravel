@@ -32,11 +32,7 @@ Route::middleware('auth')->group(function () {
     // EVENTS
     // ========================================
     
-    // Rotas públicas (todos podem ver)
-    Route::get('/events', [EventController::class, 'index'])->name('events.index');
-    Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
-    
-    // Rotas protegidas (apenas Organizer e Admin)
+    // 🔥 ROTAS PROTEGIDAS PRIMEIRO (mais específicas)
     Route::middleware('organizer')->group(function () {
         Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
         Route::post('/events', [EventController::class, 'store'])->name('events.store');
@@ -44,6 +40,10 @@ Route::middleware('auth')->group(function () {
         Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
         Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
     });
+    
+    // ✅ ROTAS PÚBLICAS DEPOIS (com parâmetros)
+    Route::get('/events', [EventController::class, 'index'])->name('events.index');
+    Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 
     // ========================================
     // REGISTRATIONS (Inscrições)
